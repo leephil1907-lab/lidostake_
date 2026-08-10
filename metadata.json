@@ -1,0 +1,8 @@
+{
+  "name": "Lido Liquid Staking",
+  "description": "Stake ETH with Lido, wrap stETH, manage withdrawals, and track rewards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-text-main: var(--text);
+  --color-text-secondary: var(--text2);
+  --color-border-main: var(--border);
+  --color-input: var(--input);
+  --color-accent: var(--accent);
+}
+
+@layer base {
+  :root { 
+    --bg: #F4F6F8; 
+    --card: #FFFFFF; 
+    --text: #273852; 
+    --text2: #7A8AA0; 
+    --border: #E5E9ED; 
+    --input: #F4F6F8; 
+    --accent: #E5F5FF; 
+  }
+  .dark { 
+    --bg: #0F1722; 
+    --card: #1C2635; 
+    --text: #FFFFFF; 
+    --text2: #8A99AD; 
+    --border: #27354A; 
+    --input: #141E2C; 
+    --accent: #1A3048; 
+  }
+  body { 
+    font-family: 'Manrope', -apple-system, sans-serif; 
+    background-color: var(--bg); 
+    color: var(--text); 
+    transition: background-color 0.3s, color 0.3s; 
+  }
+  
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+}
+
+@layer utilities {
+  .animate-in {
+    animation: fade-in 0.3s ease-in-out;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
