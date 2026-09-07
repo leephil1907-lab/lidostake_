@@ -15,6 +15,8 @@ import { TermsAgreementModal } from './components/TermsAgreementModal';
 import { LidoLogo } from './components/LidoLogo';
 import { useLivePrices } from './hooks/usePrices';
 import { CardSkeleton } from './components/LoadingSkeleton';
+import { SupportChat } from './components/SupportChat';
+import { AdminDashboard } from './components/AdminDashboard';
 
 interface MarketData {
   ethPrice: number | null;
@@ -153,9 +155,12 @@ function AppContent() {
     }
   };
 
+  if (window.location.pathname === '/admin') return <AdminDashboard />;
+
   return (
     <>
       <TermsAgreementModal />
+      <SupportChat />
       <div className="min-h-screen pb-20 transition-colors duration-300 relative">
       {/* Pull-To-Refresh Banner Indicator */}
       {pullDistance > 0 && (

@@ -23,6 +23,8 @@ VITE_ALCHEMY_API_KEY=your_alchemy_api_key
 VITE_LIDO_REFERRAL_ADDRESS=0x0000000000000000000000000000000000000000
 VITE_STETH_ADDRESS=0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84
 VITE_WSTETH_ADDRESS=0x7f39C581F595B53c5cb19bd0b3f8DA6c935E2Ca0
+ADMIN_EMAIL=your-admin-email
+ADMIN_PASSWORD=use-a-long-random-password
 ```
 
 `VITE_*` values are compiled into the browser bundle. Only use public project IDs and client-side RPC keys. Never place private keys or admin secrets in these variables.
@@ -67,3 +69,9 @@ deployctl deploy --project=YOUR_PROJECT_NAME server-deno.ts
 - `server-deno.ts` is the Deno Deploy entrypoint.
 - The current app is a frontend plus static health endpoint; no private-key custody or privileged backend signing is used.
 - Configure the Alchemy key in Deno Deploy rather than committing it.
+
+## Admin and support
+
+The public site has a support chat at the lower-right corner. Tickets are stored in Deno KV. The protected admin panel is available at `/admin` but is not linked in public navigation. Configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` as Deno Deploy environment variables. Admin sessions are HttpOnly, Secure, SameSite cookies and expire after eight hours.
+
+Set a strong unique password and never put admin credentials in a `VITE_*` variable.
