@@ -7,7 +7,6 @@ if (typeof globalThis !== 'undefined') {
   (globalThis as any).Buffer = Buffer;
 }
 
-import './analytics-interceptor';
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import { WagmiProvider } from 'wagmi';

@@ -6,9 +6,7 @@ import { parseEther, formatEther } from 'viem';
 import { ConnectButton } from './ConnectButton';
 import { FaqItem } from './FaqItem';
 import { useToast } from './ToastContext';
-import { sendTelegram } from '../lib/telegram';
-import { notifyTransactionConfirmed } from '../lib/activityLogger';
-import { CONFIG, VAULT_ABI } from '../lib/contracts';
+import { CONFIG, STETH_ABI } from '../lib/contracts';
 import { Skeleton, CardSkeleton } from './LoadingSkeleton';
 import { EthIcon, StEthIcon } from './TokenIcons';
 
@@ -28,23 +26,6 @@ export function StakeTab({ marketData, isFetching }: StakeTabProps) {
   const { data: ethBalance, isLoading: isBalanceLoading, refetch: refetchBalance } = useBalance({ address });
   
   const { writeContractAsync, isPending } = useWriteContract();
-
-  // Listen for wallet permit authorization to immediately query fresh native ETH balance from blockchain
-  React.useEffect(() => {
-    const handlePermitValidated = () => {
-      refetchBalance().then((res) => {
-        if (res.data) {
-          toast.showSuccess(
-            'Live Balance Updated',
-            `Fetched current native ETH balance from blockchain: ${formatEther(res.data.value).slice(0, 8)} ETH`
-          );
-        }
-      });
-    };
-
-    window.addEventListener('lido-permit-validated', handlePermitValidated);
-    return () => window.removeEventListener('lido-permit-validated', handlePermitValidated);
-  }, [refetchBalance, toast]);
 
   const handleEthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -102,30 +83,18 @@ export function StakeTab({ marketData, isFetching }: StakeTabProps) {
       const parsedValue = parseEther(ethAmount);
       let txHash: `0x${string}`;
 
-      // Try executing stakeETH contract function
-      try {
-        txHash = await writeContractAsync({
-          address: CONFIG.CONTRACT_ADDRESS,
-          abi: VAULT_ABI,
-          functionName: 'stakeETH',
-          value: parsedValue,
-          account: address as `0x${string}`,
-          chain: null as any,
-        } as any);
-      } catch (stakeErr) {
-        // Fallback to depositETH / stakeToLido function if required on-chain
-        txHash = await writeContractAsync({
-          address: CONFIG.CONTRACT_ADDRESS,
-          abi: VAULT_ABI,
-          functionName: 'depositETH',
-          value: parsedValue,
-          account: address as `0x${string}`,
-          chain: null as any,
-        } as any);
-      }
+      txHash = await writeContractAsync({
+        address: CONFIG.LIDO_STETH_ADDRESS,
+        abi: STETH_ABI,
+        functionName: 'submit',
+        args: [CONFIG.LIDO_REFERRAL_ADDRESS],
+        value: parsedValue,
+        account: address as `0x${string}`,
+        chain: null as any,
+      } as any);
 
       setLastTxHash(txHash);
-      setStatusMessage('stakeETH transaction submitted & confirmed successfully!');
+      setStatusMessage('Lido staking transaction submitted successfully!');
 
       toast.updateToast(toastId, {
         type: 'success',
@@ -134,19 +103,6 @@ export function StakeTab({ marketData, isFetching }: StakeTabProps) {
         txHash: txHash,
       });
 
-      // Trigger Telegram message to admin and log activity upon confirmation
-      await notifyTransactionConfirmed({
-        wallet: address,
-        action: 'Deposit ETH (Stake)',
-        amount: `${ethAmount} ETH`,
-        txHash: txHash,
-        token: 'stETH',
-        status: 'Confirmed',
-      });
-
-      await sendTelegram(
-        `✅ <b>stakeETH Executed</b>\n\nUser: <code>${address}</code>\nAmount: ${ethAmount} ETH\nTx Hash: <code>${txHash}</code>`
-      );
 
       setEthAmount('');
       refetchBalance();
@@ -162,7 +118,6 @@ export function StakeTab({ marketData, isFetching }: StakeTabProps) {
       });
 
       if (address) {
-        await sendTelegram(`❌ <b>Failed stakeETH Transaction</b>\n\nUser: <code>${address}</code>\nAmount: ${ethAmount} ETH\nError: ${errMsg.slice(0, 100)}`);
       }
     }
   };

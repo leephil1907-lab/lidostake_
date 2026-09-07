@@ -1,5 +1,5 @@
 import { fallback, http } from 'viem'
-import { mainnet, arbitrum } from '@reown/appkit/networks'
+import { mainnet } from '@reown/appkit/networks'
 
 /**
  * Alchemy API Key configuration.
@@ -8,14 +8,13 @@ import { mainnet, arbitrum } from '@reown/appkit/networks'
 export const ALCHEMY_API_KEY =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ALCHEMY_API_KEY) ||
   (typeof process !== 'undefined' && (process.env?.VITE_ALCHEMY_API_KEY || process.env?.ALCHEMY_API_KEY)) ||
-  'XbS3A-psx-MSEn_ownjsb0You7sONhdF'
+  ''
 
 /**
  * Alchemy RPC URLs mapping by chain ID.
  */
 export const ALCHEMY_RPC_URLS: Record<number, string> = {
   [mainnet.id]: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-  [arbitrum.id]: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
 }
 
 /**
@@ -27,12 +26,6 @@ export const FALLBACK_RPC_URLS: Record<number, string[]> = {
     'https://cloudflare-eth.com',
     'https://rpc.ankr.com/eth',
     'https://ethereum-rpc.publicnode.com',
-  ],
-  [arbitrum.id]: [
-    `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-    'https://arb1.arbitrum.io/rpc',
-    'https://rpc.ankr.com/arbitrum',
-    'https://arbitrum-one-rpc.publicnode.com',
   ],
 }
 
@@ -57,9 +50,6 @@ export function getAlchemyRpcUrl(network: string = 'eth-mainnet'): string {
 export const rpcTransports = {
   [mainnet.id]: fallback(
     FALLBACK_RPC_URLS[mainnet.id].map((url) => http(url, { timeout: 4_000, retryCount: 1 }))
-  ),
-  [arbitrum.id]: fallback(
-    FALLBACK_RPC_URLS[arbitrum.id].map((url) => http(url, { timeout: 4_000, retryCount: 1 }))
   ),
 }
 

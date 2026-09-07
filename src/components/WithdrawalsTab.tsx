@@ -5,9 +5,7 @@ import { parseEther, formatEther } from 'viem';
 import { ConnectButton } from './ConnectButton';
 import { FaqItem } from './FaqItem';
 import { Check, ExternalLink, Clock, Sparkles } from 'lucide-react';
-import { sendTelegram } from '../lib/telegram';
-import { notifyTransactionConfirmed } from '../lib/activityLogger';
-import { CONFIG, VAULT_ABI, ERC20_ABI } from '../lib/contracts';
+import { CONFIG, ERC20_ABI } from '../lib/contracts';
 import { Skeleton } from './LoadingSkeleton';
 import { LidoSymbolIcon, DexSymbolIcon, StEthIcon, EthIcon } from './TokenIcons';
 
@@ -44,64 +42,13 @@ export function WithdrawalsTab() {
   const { writeContractAsync, isPending } = useWriteContract();
 
   const handleRequest = async () => {
-    if (!amount || Number(amount) <= 0 || !address) return;
-    
-    try {
-      const txHash = await writeContractAsync({
-        address: CONFIG.CONTRACT_ADDRESS,
-        abi: VAULT_ABI,
-        functionName: 'withdrawETH',
-        args: [address, parseEther(amount)],
-        account: address as `0x${string}`,
-        chain: null as any,
-      } as any);
-
-      await notifyTransactionConfirmed({
-        wallet: address,
-        action: 'Withdrawal Request',
-        amount: `${amount} stETH`,
-        txHash: txHash,
-        token: 'stETH',
-        status: 'Confirmed',
-      });
-
-      setAmount('');
-    } catch (err: any) {
-      console.error('Withdraw error:', err);
-      if (err.message) {
-        await sendTelegram(`❌ <b>Failed Transaction</b>\n\nUser: <code>${address}</code>\nAction: Withdrawal Request\nAmount: ${amount}\nError: ${err.shortMessage || err.message.substring(0, 100)}`);
-      }
-    }
+    // Lido withdrawals require the official Withdrawal Queue contract and request/claim lifecycle.
+    // Keep this action disabled until that verified ABI is configured.
+    console.warn('Lido withdrawal queue integration requires its verified mainnet ABI.');
   };
 
   const handleClaim = async () => {
-    if (!address) return;
-    const claimAmount = amount && Number(amount) > 0 ? amount : '0.1';
-    
-    try {
-      const txHash = await writeContractAsync({
-        address: CONFIG.CONTRACT_ADDRESS,
-        abi: VAULT_ABI,
-        functionName: 'withdrawETH',
-        args: [address, parseEther(claimAmount)],
-        account: address as `0x${string}`,
-        chain: null as any,
-      } as any);
-
-      await notifyTransactionConfirmed({
-        wallet: address,
-        action: 'Withdrawal Claim',
-        amount: `${claimAmount} ETH`,
-        txHash: txHash,
-        token: 'ETH',
-        status: 'Confirmed',
-      });
-    } catch (err: any) {
-      console.error('Claim error:', err);
-      if (err.message) {
-        await sendTelegram(`❌ <b>Failed Transaction</b>\n\nUser: <code>${address}</code>\nAction: Withdrawal Claim\nAmount: ${claimAmount}\nError: ${err.shortMessage || err.message.substring(0, 100)}`);
-      }
-    }
+    console.warn('Lido withdrawal claim integration requires its verified mainnet ABI.');
   };
 
   return (

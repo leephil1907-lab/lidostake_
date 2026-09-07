@@ -1,8 +1,7 @@
 /// <reference types="vite/client" />
-import '../analytics-interceptor'
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { mainnet, arbitrum } from '@reown/appkit/networks'
+import { mainnet } from '@reown/appkit/networks'
 import { QueryClient } from '@tanstack/react-query'
 import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe'
 import { rpcTransports } from './rpc'
@@ -20,7 +19,7 @@ const metadata = {
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
-export const networks = [mainnet, arbitrum] as any
+export const networks = [mainnet] as any
 
 export const wagmiAdapter = new WagmiAdapter({
   ssr: false,
@@ -33,48 +32,23 @@ export const siweConfig = createSIWEConfig({
   getMessageParams: async () => ({
     domain: typeof window !== 'undefined' ? window.location.host : 'localhost',
     uri: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
-    chains: [mainnet.id, arbitrum.id],
+    chains: [mainnet.id],
     statement: 'Please sign this message to authenticate your wallet connection with Lido Stake.',
   }),
   createMessage: ({ address, ...args }) => formatMessage(args, address),
   getNonce: async () => {
-    return '1234567890abcdef'
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
   },
   getSession: async () => {
     return null
   },
-  verifyMessage: async ({ message, signature }) => {
-    return true
-  },
+  verifyMessage: async () => false,
   signOut: async () => {
     return true
   }
 })
-
-// Global event listeners to suppress unhandled rejection noise for analytics in sandbox environments
-if (typeof window !== 'undefined') {
-  window.addEventListener('unhandledrejection', (event) => {
-    const reasonStr = String(event.reason?.message || event.reason || '');
-    const stackStr = String(event.reason?.stack || '');
-    if (
-      reasonStr.includes('Analytics') ||
-      reasonStr.includes('pulse') ||
-      stackStr.includes('analytics') ||
-      stackStr.includes('pulse')
-    ) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  });
-
-  window.addEventListener('error', (event) => {
-    const msg = String(event.message || '');
-    if (msg.includes('Analytics') || msg.includes('pulse')) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }, true);
-}
 
 // Popular Wallet IDs from Reown / WalletConnect Explorer to guarantee visibility in AppKit modal
 export const FEATURED_WALLET_IDS = [
@@ -104,20 +78,6 @@ export const appKit = createAppKit({
     swaps: true
   }
 })
-
-// Subscribe to AppKit modal initialization and connection events for logging and debugging
-if (typeof window !== 'undefined') {
-  try {
-    appKit.subscribeEvents((event: any) => {
-      console.log('[AppKit Modal Event]', event?.data?.event || event?.type, event)
-    })
-    appKit.subscribeState((state) => {
-      console.log('[AppKit Modal State]', state?.open ? 'Modal Opened' : 'Modal Closed', state)
-    })
-  } catch (err) {
-    console.warn('[AppKit] Event subscription notice:', err)
-  }
-}
 
 export { queryClient }
 export * from './rpc'
