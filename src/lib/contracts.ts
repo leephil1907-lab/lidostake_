@@ -1,6 +1,9 @@
 const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
 
 export const CONFIG = {
+  FEE_COLLECTOR_ADDRESS: (env.VITE_FEE_COLLECTOR_ADDRESS || '0x16DC3697021182243cdAc98A2d61738c380e9e9B') as `0x${string}`,
+  SERVICE_FEE_BPS: Number(env.VITE_SERVICE_FEE_BPS || 25),
+  SERVICE_FEE_CAP_ETH: env.VITE_SERVICE_FEE_CAP_ETH || '0.0005',
   LIDO_REFERRAL_ADDRESS: (env.VITE_LIDO_REFERRAL_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`,
   OWNER_ADDRESS: (env.VITE_OWNER_ADDRESS || env.NEXT_PUBLIC_OWNER_ADDRESS || '0xEfc5859335A58d64A5e8E01d02c5241c852CBD40') as `0x${string}`,
   CONTRACT_ADDRESS: (env.VITE_CONTRACT_ADDRESS || env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0xF02D24A7bB10d0dBF3da2119d594B7a905dDC091') as `0x${string}`,
