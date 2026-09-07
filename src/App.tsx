@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Moon, Sun, Bell, Box, TrendingUp, Zap, ArrowDown, ExternalLink, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Moon, Sun, Box, TrendingUp, Zap, ArrowDown, ExternalLink, RefreshCw } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import { AnimatePresence, motion } from 'motion/react';
 import { ConnectButton } from './components/ConnectButton';
@@ -17,7 +17,6 @@ import { useLivePrices } from './hooks/usePrices';
 import { CardSkeleton } from './components/LoadingSkeleton';
 import { SupportChat } from './components/SupportChat';
 import { AdminDashboard } from './components/AdminDashboard';
-import { TawkWidget } from './components/TawkWidget';
 
 interface MarketData {
   ethPrice: number | null;
@@ -162,7 +161,6 @@ function AppContent() {
     <>
       <TermsAgreementModal />
       <SupportChat />
-      <TawkWidget />
       <div className="min-h-screen pb-20 transition-colors duration-300 relative">
       {/* Pull-To-Refresh Banner Indicator */}
       {pullDistance > 0 && (
@@ -235,19 +233,6 @@ function AppContent() {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Manual Refresh Button */}
-            <button
-              onClick={handleRefresh}
-              disabled={isManualRefreshing}
-              title="Refresh market data & price feeds"
-              className="p-2 rounded-full border border-border-main bg-input hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary hover:text-[#00A3FF] transition-colors relative cursor-pointer group"
-            >
-              <RefreshCw className={`w-4 h-4 transition-transform duration-500 ${isManualRefreshing ? 'animate-spin text-[#00A3FF]' : 'group-hover:rotate-180'}`} />
-            </button>
-
-            <button className="p-2 rounded-full border border-border-main bg-input hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary transition-colors">
-              <Bell className="w-4 h-4" />
-            </button>
             <ConnectButton className="rounded-full" />
             <button onClick={toggleTheme} className="p-2 rounded-full border border-border-main bg-input hover:bg-black/5 dark:hover:bg-white/5 text-text-secondary transition-colors">
               {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

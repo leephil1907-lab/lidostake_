@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { MessageCircle, X, Send, LifeBuoy, ExternalLink } from 'lucide-react';
 import { LidoLogo } from './LidoLogo';
 
@@ -11,6 +11,11 @@ const answers: Record<string, string> = {
 
 export function SupportChat() {
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const drag = useRef<{ x: number; y: number } | null>(null);
+  const move = (event: PointerEvent) => { if (!drag.current) return; setPosition({ x: event.clientX - drag.current.x, y: event.clientY - drag.current.y }); };
+  const stop = () => { drag.current = null; window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', stop); };
+  const start = (event: React.PointerEvent) => { drag.current = { x: event.clientX - position.x, y: event.clientY - position.y }; window.addEventListener('pointermove', move); window.addEventListener('pointerup', stop); };
   const [messages, setMessages] = useState([{ from: 'bot', text: 'Hi! I can help with staking, wallets, withdrawals, and fees.' }]);
   const [input, setInput] = useState('');
   const [ticketOpen, setTicketOpen] = useState(false);
@@ -34,7 +39,7 @@ export function SupportChat() {
   };
 
   return <>
-    <button aria-label="Open support chat" onClick={() => setOpen(true)} className="fixed right-4 bottom-20 sm:bottom-6 z-40 w-14 h-14 rounded-full bg-[#00A3FF] text-white shadow-xl shadow-[#00A3FF]/30 flex items-center justify-center hover:scale-105 transition-transform"><MessageCircle /></button>
+    <button aria-label="Open support chat" onPointerDown={start} onClick={() => { if (!drag.current) setOpen(true); }} style={{ transform: `translate(${position.x}px, ${position.y}px)` }} className="fixed right-4 bottom-20 sm:bottom-6 z-40 touch-none cursor-move w-14 h-14 rounded-full bg-[#00A3FF] text-white shadow-xl shadow-[#00A3FF]/30 flex items-center justify-center hover:scale-105 transition-transform"><MessageCircle /></button>
     {open && <div className="fixed right-4 bottom-20 sm:bottom-24 z-50 w-[calc(100vw-2rem)] max-w-sm bg-card border border-border-main rounded-3xl shadow-2xl overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-[#00A3FF] to-[#00D09E] text-white flex items-center justify-between"><div className="flex items-center gap-3"><div className="bg-white rounded-full p-2"><LidoLogo className="w-6 h-6" /></div><div><p className="font-extrabold">Lido Support</p><p className="text-xs opacity-80">Guidance and tickets</p></div></div><button onClick={() => setOpen(false)}><X /></button></div>
       {!ticketOpen ? <><div className="p-4 h-64 overflow-y-auto space-y-3">{messages.map((message, i) => <div key={i} className={`max-w-[88%] rounded-2xl px-3 py-2 text-sm ${message.from === 'user' ? 'ml-auto bg-[#00A3FF] text-white' : 'bg-input text-text-main'}`}>{message.text}</div>)}</div><div className="px-4 pb-3 flex flex-wrap gap-2">{['Staking help', 'Wallet help', 'Withdrawal help', 'Fee help'].map((label) => <button key={label} onClick={() => ask(label)} className="text-xs border border-border-main rounded-full px-3 py-1.5 hover:border-[#00A3FF]">{label}</button>)}</div><div className="p-3 border-t border-border-main flex gap-2"><input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Ask a question" className="min-w-0 flex-1 bg-input rounded-xl px-3 py-2 text-sm outline-none" /><button onClick={send} className="p-2 rounded-xl bg-[#00A3FF] text-white"><Send className="w-4 h-4" /></button></div><button onClick={() => setTicketOpen(true)} className="w-full border-t border-border-main p-3 text-sm font-bold text-[#00A3FF] flex items-center justify-center gap-2"><LifeBuoy className="w-4 h-4" /> Open a support ticket</button></> : <form onSubmit={submitTicket} className="p-4 space-y-3"><button type="button" onClick={() => setTicketOpen(false)} className="text-xs text-text-secondary">← Back to chat</button><input required type="email" placeholder="Your email" value={ticket.email} onChange={(e) => setTicket({ ...ticket, email: e.target.value })} className="w-full bg-input rounded-xl px-3 py-2 text-sm" /><input required placeholder="Subject" value={ticket.subject} onChange={(e) => setTicket({ ...ticket, subject: e.target.value })} className="w-full bg-input rounded-xl px-3 py-2 text-sm" /><textarea required rows={5} placeholder="How can we help? Never include private keys." value={ticket.message} onChange={(e) => setTicket({ ...ticket, message: e.target.value })} className="w-full bg-input rounded-xl px-3 py-2 text-sm resize-none" /><button className="w-full bg-[#00A3FF] text-white rounded-xl py-2.5 font-bold">Send ticket</button>{status && <p className="text-xs text-text-secondary">{status}</p>}<p className="text-[11px] text-text-secondary flex gap-1"><ExternalLink className="w-3 h-3" /> Support will never ask for your seed phrase.</p></form>}
