@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "build": "deno run -A npm:vite build",
+    "start": "deno run --allow-net --allow-read --allow-env server-deno.ts",
+    "check": "deno check server-deno.ts"
+  },
+  "deploy": {
+    "entrypoint": "server-deno.ts",
+    "include": ["dist", "server-deno.ts", "deno.json"]
+  }
+}
