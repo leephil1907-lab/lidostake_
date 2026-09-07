@@ -71,7 +71,7 @@ export function StakeTab({ marketData, isFetching }: StakeTabProps) {
 
   const handleStake = async () => {
     if (!ethAmount || Number(ethAmount) <= 0 || !address) return;
-    setStatusMessage('Initiating stakeETH transaction in wallet...');
+    setStatusMessage('Preparing direct Lido staking transaction in wallet...');
     setLastTxHash(null);
     
     const toastId = toast.showPending(
@@ -224,7 +224,7 @@ export function StakeTab({ marketData, isFetching }: StakeTabProps) {
             className={`w-full py-4 text-lg rounded-xl mb-6 font-bold transition-all shadow-sm flex items-center justify-center gap-2 ${(!ethAmount || Number(ethAmount) <= 0 || isPending) ? 'bg-[#00A3FF]/50 text-white cursor-not-allowed' : 'bg-[#00A3FF] hover:bg-[#0090E6] text-white active:scale-[0.99]'}`}
           >
             {isPending && <RefreshCw className="w-5 h-5 animate-spin" />}
-            <span>{isPending ? 'Confirming in Wallet...' : isSendMaxActive ? `Stake Max ETH (${ethAmount} ETH)` : 'Stake ETH (stakeETH)'}</span>
+            <span>{isPending ? 'Confirming in Wallet...' : isSendMaxActive ? `Stake Max ETH (${ethAmount} ETH)` : 'Stake ETH'}</span>
           </button>
         ) : (
           <ConnectButton className="w-full py-4 text-lg rounded-xl mb-6 font-bold" />

@@ -6,7 +6,7 @@ import { parseEther, formatEther } from 'viem';
 import { ConnectButton } from './ConnectButton';
 import { FaqItem } from './FaqItem';
 import { useToast } from './ToastContext';
-import { CONFIG, VAULT_ABI, WSTETH_ABI, ERC20_ABI } from '../lib/contracts';
+import { CONFIG, WSTETH_ABI, ERC20_ABI } from '../lib/contracts';
 import { Skeleton } from './LoadingSkeleton';
 import { StEthIcon, WstEthIcon } from './TokenIcons';
 
