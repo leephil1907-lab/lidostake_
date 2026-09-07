@@ -14,9 +14,9 @@ const projectId = CONFIG.REOWN_PROJECT_ID || '220f2e5088a546891514ffe0fa667865'
 
 const metadata = {
   name: 'Lido Stake',
-  description: 'Lido Staking Interface',
-  url: 'https://lido.fi',
-  icons: ['https://avatars.githubusercontent.com/u/37784886']
+  description: 'Ethereum mainnet staking with stETH and wstETH',
+  url: 'https://lidostake.leephil1907-lab.deno.net',
+  icons: ['https://lidostake.leephil1907-lab.deno.net/favicon.png']
 }
 
 export const networks = [mainnet] as any
