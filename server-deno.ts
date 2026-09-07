@@ -73,7 +73,6 @@ async function serve(request: Request): Promise<Response> {
           : 'no-cache',
       },
     });
-    file.close();
     return response;
   } catch (error) {
     if (!(error instanceof Deno.errors.NotFound)) throw error;
