@@ -17,6 +17,7 @@ import { useLivePrices } from './hooks/usePrices';
 import { CardSkeleton } from './components/LoadingSkeleton';
 import { SupportChat } from './components/SupportChat';
 import { AdminDashboard } from './components/AdminDashboard';
+import { TawkWidget } from './components/TawkWidget';
 
 interface MarketData {
   ethPrice: number | null;
@@ -161,6 +162,7 @@ function AppContent() {
     <>
       <TermsAgreementModal />
       <SupportChat />
+      <TawkWidget />
       <div className="min-h-screen pb-20 transition-colors duration-300 relative">
       {/* Pull-To-Refresh Banner Indicator */}
       {pullDistance > 0 && (
