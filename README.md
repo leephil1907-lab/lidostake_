@@ -10,7 +10,7 @@ A motion-enabled Ethereum mainnet interface for direct Lido staking, live market
 - Live ETH/stETH market prices and 24-hour metrics
 - Responsive animated interface with dark/light theme support
 - Mainnet RPC failover with optional Alchemy support
-- No private-key custody, hidden signature capture, Telegram forwarding, or demo transaction paths
+- No private-key custody, hidden signature capture, Telegram forwarding or artificial transaction paths
 
 ## Setup
 
