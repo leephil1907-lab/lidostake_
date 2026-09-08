@@ -234,7 +234,7 @@ export function StakeTab({ marketData, isFetching }: StakeTabProps) {
           <div className="absolute inset-0 bg-gradient-to-r from-[#00A3FF]/0 via-[#00A3FF]/5 to-[#00A3FF]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
           <div className="relative z-10">
             <p className="font-extrabold text-sm text-text-main flex items-center gap-2">
-              Lido APR
+              Lido staking APR
               <span className="text-[#00A3FF] bg-[#00A3FF]/10 px-2 py-0.5 rounded-full text-xs">{marketData.apr.toFixed(1)}%</span>
             </p>
             <p className="text-xs text-text-secondary mt-1">Receive stETH and staking rewards</p>

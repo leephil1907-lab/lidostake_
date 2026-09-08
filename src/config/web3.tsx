@@ -3,7 +3,6 @@ import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { mainnet } from '@reown/appkit/networks'
 import { QueryClient } from '@tanstack/react-query'
-import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe'
 import { rpcTransports } from './rpc'
 
 import { CONFIG } from '../lib/contracts'
@@ -26,28 +25,6 @@ export const wagmiAdapter = new WagmiAdapter({
   projectId,
   networks,
   transports: rpcTransports
-})
-
-export const siweConfig = createSIWEConfig({
-  getMessageParams: async () => ({
-    domain: typeof window !== 'undefined' ? window.location.host : 'localhost',
-    uri: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
-    chains: [mainnet.id],
-    statement: 'Please sign this message to authenticate your wallet connection with Lido Stake.',
-  }),
-  createMessage: ({ address, ...args }) => formatMessage(args, address),
-  getNonce: async () => {
-    const bytes = new Uint8Array(16);
-    crypto.getRandomValues(bytes);
-    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
-  },
-  getSession: async () => {
-    return null
-  },
-  verifyMessage: async () => false,
-  signOut: async () => {
-    return true
-  }
 })
 
 // Popular Wallet IDs from Reown / WalletConnect Explorer to guarantee visibility in AppKit modal
@@ -74,8 +51,8 @@ export const appKit = createAppKit({
     analytics: false,
     email: false,
     socials: false,
-    onramp: true,
-    swaps: true
+    onramp: false,
+    swaps: false
   }
 })
 
