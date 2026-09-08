@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAccount, useBalance, useReadContracts, useDisconnect, useConnect } from 'wagmi';
+import { useAccount, useBalance, useReadContracts, useDisconnect, useConnect, useChainId, useSwitchChain } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { appKit } from '../config/web3';
 import { formatEther } from 'viem';
@@ -14,6 +14,8 @@ interface ConnectButtonProps {
 export function ConnectButton({ className }: ConnectButtonProps) {
   const { open } = useAppKit();
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
   const { disconnect } = useDisconnect();
   const { connectors, connect } = useConnect();
 
@@ -80,6 +82,12 @@ export function ConnectButton({ className }: ConnectButtonProps) {
     refetchTokens();
   };
 
+
+  if (isConnected && address && chainId !== 1) {
+    return <button onClick={() => switchChain({ chainId: 1 })} disabled={isSwitching} className={`px-5 py-2.5 rounded-xl text-white font-bold text-sm bg-amber-500 hover:bg-amber-600 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${className || ''}`}>
+      {isSwitching ? 'Switching network…' : 'Switch to Ethereum mainnet'}
+    </button>;
+  }
 
   if (!isConnected || !address) {
     return (
