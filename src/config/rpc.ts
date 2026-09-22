@@ -14,7 +14,7 @@ export const ALCHEMY_API_KEY =
  * Alchemy RPC URLs mapping by chain ID.
  */
 export const ALCHEMY_RPC_URLS: Record<number, string> = {
-  [mainnet.id]: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+  ...(ALCHEMY_API_KEY ? { [mainnet.id]: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}` } : {}),
 }
 
 /**
@@ -22,7 +22,7 @@ export const ALCHEMY_RPC_URLS: Record<number, string> = {
  */
 export const FALLBACK_RPC_URLS: Record<number, string[]> = {
   [mainnet.id]: [
-    `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+    ...(ALCHEMY_API_KEY ? [`https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`] : []),
     'https://cloudflare-eth.com',
     'https://rpc.ankr.com/eth',
     'https://ethereum-rpc.publicnode.com',

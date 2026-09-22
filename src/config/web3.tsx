@@ -9,7 +9,7 @@ import { CONFIG } from '../lib/contracts'
 
 const queryClient = new QueryClient()
 
-const projectId = CONFIG.REOWN_PROJECT_ID || '220f2e5088a546891514ffe0fa667865'
+const projectId = CONFIG.REOWN_PROJECT_ID
 
 const metadata = {
   name: 'Lido Stake',
