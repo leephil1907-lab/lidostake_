@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ExternalLink, RefreshCw, CheckCircle, AlertCircle, ArrowDownUp } from 'lucide-react';
-import { useAccount, useBalance, useReadContract, useWriteContract, useSignTypedData, useChainId } from 'wagmi';
+import { useAccount, useBalance, useReadContract, useWriteContract } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
 import { ConnectButton } from './ConnectButton';
 import { FaqItem } from './FaqItem';
@@ -19,8 +19,6 @@ export function WrapTab() {
 
   const toast = useToast();
   const { isConnected, address } = useAccount();
-  const chainId = useChainId();
-  const { signTypedDataAsync } = useSignTypedData();
   const { writeContractAsync, isPending } = useWriteContract();
 
 
