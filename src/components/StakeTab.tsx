@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowDown, ExternalLink, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import { ExternalLink, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAccount, useBalance, useWriteContract } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
 import { ConnectButton } from './ConnectButton';
@@ -167,10 +167,9 @@ export function StakeTab({ marketData, isFetching }: StakeTabProps) {
             />
           </div>
           
-          <div className="absolute top-4 right-4 flex items-center gap-2 bg-card rounded-full pr-3 pl-1.5 py-1 shadow-sm border border-border-main cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+          <div className="absolute top-4 right-4 flex items-center gap-2 bg-card rounded-full pr-3 pl-1.5 py-1 shadow-sm border border-border-main">
             <EthIcon className="w-6 h-6" />
             <span className="text-sm font-extrabold text-text-main">ETH</span>
-            <ArrowDown className="w-3 h-3 text-text-secondary ml-1" />
           </div>
           
           <div className="flex justify-between items-end">
